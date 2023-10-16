@@ -79,23 +79,26 @@ def fetch_apple_stock_data():
         #after the operations in the block have successfully 
         #been completed
         # Define the full path to the file
-        file_path = os.path.join(raw_data_path, 'apple_stock_data.html')
+        raw_file_path = os.path.join(raw_data_path, 'apple_stock_data.html')
+        processed_file_path = os.path.join(processed_data_path, 'apple_stock_data.json')
 
         # Use the full path in the open function
-        with open(file_path, 'w', encoding='utf-8') as file:
+        with open(raw_file_path, 'w', encoding='utf-8') as file:
             file.write(response.text)
         #Check if the file has automatically been closed
         #file.closed
         
         soup = BeautifulSoup(response.text, 'lxml')
         table_data = soup.find_all('td', class_ = 'text-v2-black text-right text-sm font-normal leading-5 align-middle min-w-[77px] rtl:text-right')
-        for price_data in table_data:
-            print(price_data.text.strip())
-
-        
-        
-        
-        
+        list_of_open_stock_price = []
+        for open_stock_prices in table_data:
+            stock_price = open_stock_prices.text.strip()
+            list_of_open_stock_price.append({
+                'open': stock_price
+            })
+            
+        with open(processed_file_path, 'w') as file:
+            json.dump(list_of_open_stock_price, file, indent=4)
         
     #Works with the try block
     except requests.ConnectionError:
