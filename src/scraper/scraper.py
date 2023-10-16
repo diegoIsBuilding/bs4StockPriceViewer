@@ -5,11 +5,18 @@ import os
 import json 
 
 #Make sure the directories for raw/processed data exist
-if not os.path.exists('data/raw'):
-    os.makedirs('data/raw')
-if not os.path.exists('data/processed'):
-    os.makedirs('data/processed')
-    
+# Get the current script's directory
+current_directory = os.path.dirname(os.path.abspath(__file__))
+
+# Define the path to the data directories from the current script's location
+raw_data_path = os.path.join(current_directory, '..', '..', 'data', 'raw')
+processed_data_path = os.path.join(current_directory, '..', '..', 'data', 'processed')
+
+# Create the directories if they don't exist
+if not os.path.exists(raw_data_path):
+    os.makedirs(raw_data_path)
+if not os.path.exists(processed_data_path):
+    os.makedirs(processed_data_path)
 #Fetch the stock data for Apple
 #Retrieve the open price for the last 2 year (10/14/21 - 10/14/23)
 
@@ -56,9 +63,35 @@ def fetch_apple_stock_data():
         #WITH KEYWORD: this makes sure that the session is
         #properly closed after it is done
         with requests.Session() as session:
+            #This updates the headers with the headers
+            #defined in the 'headers' dictionary
             session.headers.update(headers)
-            response = session.get(url, verify=False, timeout=10)
+            #This sends a GET request to the url
+            #The timeout method specifies that if there
+            #is no response in 10 seconds a timeout exception
+            #will be raised
+            response = session.get(url, timeout=10)
+        #If the HTTP request returns an error code like 
+        #404 or 500 this will return an HTTPError exception 
         response.raise_for_status()
+        
+        #'with' makes sure that the file is properly closed
+        #after the operations in the block have successfully 
+        #been completed
+        # Define the full path to the file
+        file_path = os.path.join(raw_data_path, 'apple_stock_data.html')
+
+        # Use the full path in the open function
+        with open(file_path, 'w', encoding='utf-8') as file:
+            file.write(response.text)
+        #Check if the file has automatically been closed
+        #file.closed
+        
+        soup = BeautifulSoup(response.text, 'lxml')
+        table_data = soup.find_all('td', class_ = 'text-v2-black text-right text-sm font-normal leading-5 align-middle min-w-[77px] rtl:text-right')
+        for price_data in table_data:
+            print(price_data.text.strip())
+
         
         
         
@@ -73,3 +106,5 @@ def fetch_apple_stock_data():
         print(f'An error occurred while fetching the data: {e}')
     except Exception as e:
         print(f'An unexpected error occurred: {e}')
+
+fetch_apple_stock_data()
