@@ -51,6 +51,13 @@ def fetch_apple_stock_data():
         #is being requested (See the where the traffic is coming from)
         'Referer': referer
     }
+    def append_to_stock_data(dates, prices):
+        '''Utility function to append article data to article_info list'''
+        data = {
+            'date': dates,
+            'price': prices,
+        }
+        stock_data.append(data)
     
     #Create a try block
     #The block is used to catch any exceptions that may occur
@@ -89,16 +96,39 @@ def fetch_apple_stock_data():
         #file.closed
         
         soup = BeautifulSoup(response.text, 'lxml')
-        table_data = soup.find_all('td', class_ = 'text-v2-black text-right text-sm font-normal leading-5 align-middle min-w-[77px] rtl:text-right')
+        table_data = soup.find('table', class_ = 'w-full text-xs leading-4 overflow-x-auto freeze-column-w-1')
+        open_stock_price_dates_container = table_data.find_all('td', class_ = 'datatable_cell__LJp3C text-left align-middle overflow-hidden text-v2-black text-ellipsis whitespace-nowrap text-sm font-semibold leading-4 min-w-[106px] left-0 sticky bg-white sm:bg-inherit')
+        open_stock_prices = table_data.find_all('td', class_ = 'text-v2-black text-right text-sm font-normal leading-5 align-middle min-w-[77px] rtl:text-right')
+        
+        stock_data = []
+        if table_data:
+            for date in open_stock_price_dates_container:
+                if date:
+                    dates = date.find('time').text.strip()
+                else: dates = 'Unknown'
+            for stock_price in open_stock_prices:
+                if stock_price:
+                    prices = stock_price.text.strip()
+                else: prices = 'Unknown'
+                print(dates, prices)
+              
+        
+            
+            
+            
+            
+        '''open_price_data = soup.find_all('td', class_ = 'text-v2-black text-right text-sm font-normal leading-5 align-middle min-w-[77px] rtl:text-right')
+        stock_date_data = soup.find_all()
         list_of_open_stock_price = []
-        for open_stock_prices in table_data:
+        for open_stock_prices in open_price_data:
             stock_price = open_stock_prices.text.strip()
             list_of_open_stock_price.append({
                 'open': stock_price
-            })
+            })'''
+        
             
         with open(processed_file_path, 'w') as file:
-            json.dump(list_of_open_stock_price, file, indent=4)
+            json.dump(stock_data, file, indent=4)
         
     #Works with the try block
     except requests.ConnectionError:
