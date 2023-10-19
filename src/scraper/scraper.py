@@ -109,9 +109,11 @@ def fetch_apple_stock_data():
                 if open_price:
                     price = open_price.text.strip()
                 else: price = 'Unknown'
-                append_to_stock_data(date, price)
-                print(date, price)
                 
+                
+                if date != 'Unknown' and price != 'Unknown':
+                    append_to_stock_data(date, price)
+                    print(date, price)
         
                 
               
