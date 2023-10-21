@@ -15,6 +15,12 @@ def load_stock_data_from_json():
     return stock_data
 
 def plot_stock_data(stock_data):
+    #Get the current directory of the plotter.py file
+    current_directory = os.path.dirname(os.path.abspath(__file__))
+    
+    #Construct the path to the img directory
+    img_dir_path = os.path.join(current_directory, '..', 'webapp', 'static', 'img')
+    
     #Convert the list of dictionaries to a DataFrame
     df_Conversion = pd.DataFrame(stock_data)
     
@@ -33,11 +39,22 @@ def plot_stock_data(stock_data):
     plt.grid(True)
     plt.tight_layout()
     
+    
+    #Invert the y-axis
+    plt.gca().invert_yaxis()
+    
     #Save the plot to the static/img directory (will use in web app)
-    plot_path = 'src/webapp/static/img/apple_stock_plot.png'
+    plot_path = os.path.join(img_dir_path, 'apple_stock_plot.png')
+    
+    # Ensure the directory exists
+    os.makedirs(img_dir_path, exist_ok=True)
+    
     plt.savefig(plot_path)
     
     #Display the plot
     plt.show()
     
     return plot_path #Return the path to the saved plot
+
+stock_data = load_stock_data_from_json()
+plot_stock_data(stock_data)
