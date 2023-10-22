@@ -30,20 +30,31 @@ def plot_stock_data(stock_data):
     #Sort the data by date
     df_Conversion = df_Conversion.sort_values('date')
     
-    #Plotting
+    # Convert the 'price' column to float
+    df_Conversion['price'] = df_Conversion['price'].astype(float)
+    
+    # Calculate the daily fluctuation compared to the previous day
+    df_Conversion['daily_fluctuation'] = df_Conversion['price'].diff()
+    
+    # Instead of adjusting the first row, just set NaN to 0
+    df_Conversion['daily_fluctuation'].fillna(0, inplace=True)
+    
+    # Create the adjusted price series
+    df_Conversion['adjusted_price'] = df_Conversion['price'].iloc[0] + df_Conversion['daily_fluctuation'].cumsum()
+    
+    # Plotting
     plt.figure(figsize=(10,6))
-    plt.plot(df_Conversion['date'], df_Conversion['price'], marker = 'o', linestyle = '-')
-    plt.title('Apple Stock Price of a Month')
+    
+    # Plot the adjusted price over time
+    plt.plot(df_Conversion['date'], df_Conversion['adjusted_price'], marker = 'o', linestyle = '-')
+    
+    plt.title('Apple Stock Price Fluctuation Over a Month')
     plt.xlabel('Date')
-    plt.ylabel('Open Price')
+    plt.ylabel('Adjusted Open Price ($)') 
     plt.grid(True)
     plt.tight_layout()
     
-    
-    #Invert the y-axis
-    plt.gca().invert_yaxis()
-    
-    #Save the plot to the static/img directory (will use in web app)
+    # Save the plot to the static/img directory (will use in web app)
     plot_path = os.path.join(img_dir_path, 'apple_stock_plot.png')
     
     # Ensure the directory exists
