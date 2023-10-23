@@ -67,5 +67,4 @@ def plot_stock_data(stock_data):
     
     return plot_path #Return the path to the saved plot
 
-stock_data = load_stock_data_from_json()
-plot_stock_data(stock_data)
+
