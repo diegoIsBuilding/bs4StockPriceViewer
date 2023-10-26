@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
@@ -63,7 +65,7 @@ def plot_stock_data(stock_data):
     plt.savefig(plot_path)
     
     #Display the plot
-    plt.show()
+    #plt.show()
     
     return plot_path #Return the path to the saved plot
 
